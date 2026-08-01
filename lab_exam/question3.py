@@ -1,55 +1,41 @@
 
 
-def get_state(room_name):
-    """Ask the user for the state of a room until a valid answer is given."""
-    while True:
-        state = input("Enter the state of Room " + room_name + " (Clean/Dirty): ").strip().capitalize()
-        if state in ("Clean", "Dirty"):
-            return state
-        print("Invalid input! Please type Clean or Dirty.")
+def simple_reflex_agent(percept):
+    print("Perception Received: " + str(percept))
+    location, status = percept
+
+    if status == "Dirty":
+        return "Suck"
+    if location == "A":
+        return "Right"
+    return "Left"
 
 
-def get_location():
-    """Ask the user for the starting location of the agent."""
-    while True:
-        location = input("Enter the current location of the vacuum agent (A/B): ").strip().upper()
-        if location in ("A", "B"):
-            return location
-        print("Invalid input! Please type A or B.")
+def simulate():
+    rooms = {
+        "A": input("Enter the state of Room A (Clean/Dirty): ").strip().capitalize(),
+        "B": input("Enter the state of Room B (Clean/Dirty): ").strip().capitalize(),
+    }
+    location = input("Enter the current location of the agent (A/B): ").strip().upper()
 
+    print("Initial State: " + str(rooms))
+    print("Agent starts in Room " + location)
 
-rooms = {}
-rooms["A"] = get_state("A")
-rooms["B"] = get_state("B")
-location = get_location()
+    while rooms["A"] == "Dirty" or rooms["B"] == "Dirty":
+        action = simple_reflex_agent((location, rooms[location]))
+        print("Action Performed: " + action)
 
-print("\nInitial state -> Room A:", rooms["A"], "| Room B:", rooms["B"])
-print("Agent starts in Room", location)
-print("\n--- Agent Actions ---")
-
-step = 0
-cost = 0  
-
-while rooms["A"] == "Dirty" or rooms["B"] == "Dirty":
-    step = step + 1
-
-    if rooms[location] == "Dirty":
-        print("Step", step, ": Room", location, "is Dirty -> Action: SUCK (cleaning Room " + location + ")")
-        rooms[location] = "Clean"
-        cost = cost + 1
-    else:
-        if location == "A":
-            print("Step", step, ": Room A is Clean -> Action: MOVE RIGHT (going to Room B)")
+        if action == "Suck":
+            rooms[location] = "Clean"
+        elif action == "Right":
             location = "B"
         else:
-            print("Step", step, ": Room B is Clean -> Action: MOVE LEFT (going to Room A)")
             location = "A"
-        cost = cost + 1
 
-print("Step", step + 1, ": Both rooms are Clean -> Action: NoOp (agent stops)")
+    print("Action Performed: NoOp (both rooms are Clean)")
+    print("Final State -> Room A: " + rooms["A"] + ", Room B: " + rooms["B"])
+    print("Agent final location: Room " + location)
 
-print("--- Final Result ---")
-print("Room A :", rooms["A"])
-print("Room B :", rooms["B"])
-print("Agent final location :", location)
-print("Total actions performed :", cost)
+
+if __name__ == "__main__":
+    simulate()
